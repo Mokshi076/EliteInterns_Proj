@@ -1,38 +1,148 @@
-.App {
-  text-align: center;
+/* App.css */
+:root {
+  --primary: #e63946;
+  --secondary: #1d3557;
+  --bg: #f8f9fa;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--bg);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* Navbar */
+.navbar {
+  background-color: var(--secondary);
+  padding: 1rem 2rem;
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  position: sticky;
+  top: 0;
+  z-index: 100;
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.search-bar {
+  display: flex;
+  gap: 10px;
+}
+
+input {
+  padding: 8px;
+  border-radius: 4px;
+  border: none;
+  outline: none;
+}
+
+button.search-btn {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Categories */
+.category-bar {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  padding: 20px;
+  background: white;
+  flex-wrap: wrap;
+}
+
+.cat-btn {
+  padding: 8px 16px;
+  border: 1px solid var(--secondary);
+  background: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.cat-btn:hover, .cat-btn.active {
+  background-color: var(--secondary);
+  color: white;
+}
+
+/* News Grid */
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* News Card */
+.news-card {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s;
+}
+
+.news-card:hover {
+  transform: translateY(-5px);
+}
+
+.news-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  background-color: #eee;
+}
+
+.news-content {
+  padding: 15px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.source {
+  font-size: 0.8rem;
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.news-title {
+  font-size: 1.1rem;
+  margin: 10px 0;
+}
+
+.news-desc {
+  font-size: 0.9rem;
+  color: #555;
+  flex: 1;
+  margin-bottom: 15px;
+}
+
+.read-btn {
+  text-decoration: none;
+  background: var(--secondary);
+  color: white;
+  padding: 8px;
+  text-align: center;
+  border-radius: 4px;
+}
+
+.loading {
+  text-align: center;
+  margin-top: 50px;
+  font-size: 1.2rem;
 }
