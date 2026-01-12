@@ -1,31 +1,76 @@
-let currentTab = null;
+let activeTabId = null;
 let startTime = null;
 
-chrome.tabs.onActivated.addListener(async (activeInfo) => {
-  const now = Date.now();
+/**
+ * Save time spent on the currently active tab
+ */
+function saveTime() {
+  if (activeTabId === null || startTime === null) return;
 
-  if (currentTab && startTime) {
-    saveTime(currentTab, now - startTime);
-  }
+  chrome.tabs.get(activeTabId, (tab) => {
+    if (!tab || !tab.url) return;
 
-  const tab = await chrome.tabs.get(activeInfo.tabId);
-  currentTab = new URL(tab.url).hostname;
-  startTime = now;
-});
+    // Ignore chrome internal pages
+    if (tab.url.startsWith("chrome://")) return;
 
-chrome.windows.onFocusChanged.addListener(async () => {
-  const now = Date.now();
-  if (currentTab && startTime) {
-    saveTime(currentTab, now - startTime);
-  }
-  startTime = now;
-});
+    const now = Date.now();
+    const timeSpent = now - startTime;
 
-function saveTime(site, time) {
-  chrome.storage.local.get([site], (result) => {
-    const prev = result[site] || 0;
-    chrome.storage.local.set({
-      [site]: prev + time
+    startTime = now; // reset timer after saving
+
+    let domain;
+    try {
+      domain = new URL(tab.url).hostname;
+    } catch {
+      return;
+    }
+
+    chrome.storage.local.get([domain], (result) => {
+      const oldTime = result[domain] || 0;
+
+      chrome.storage.local.set({
+        [domain]: oldTime + timeSpent
+      });
     });
   });
 }
+
+/**
+ * When user switches tabs
+ */
+chrome.tabs.onActivated.addListener((activeInfo) => {
+  saveTime(); // save time for previous tab
+
+  activeTabId = activeInfo.tabId;
+  startTime = Date.now(); // start timing new tab
+});
+
+/**
+ * When active tab URL changes (same tab, new website)
+ */
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (tab.active && changeInfo.status === "complete") {
+    saveTime();
+    activeTabId = tabId;
+    startTime = Date.now();
+  }
+});
+
+/**
+ * Create periodic alarm to keep saving time
+ * (VERY IMPORTANT for Manifest V3)
+ */
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.alarms.create("trackTime", {
+    periodInMinutes: 0.1 // every 6 seconds
+  });
+});
+
+/**
+ * Alarm listener (keeps service worker alive)
+ */
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === "trackTime") {
+    saveTime();
+  }
+});
